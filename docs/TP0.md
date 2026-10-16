@@ -5,9 +5,6 @@ haptique\
 **Niveau :** Licence 3 / dernière année de Bachelor en Internet of
 Things\
 **Équipe :** 3-4 étudiants\
-**État du document :** proposition de conception à valider par des
-essais pratiques\
-**Périmètre :** les quatre parties du TP0
 
 ------------------------------------------------------------------------
 
