@@ -5,34 +5,32 @@ haptique\
 **Niveau :** Licence 3 / dernière année de Bachelor en Internet of
 Things\
 **Équipe :** 2 étudiants\
-**Périmètre de cette version :** TP0, Partie I --- Choix des dispositifs
-IoT\
-**État :** proposition initiale à valider par des essais pratiques
+**État du document :** proposition de conception à valider par des
+essais pratiques\
+**Périmètre :** les quatre parties du TP0
 
 ------------------------------------------------------------------------
 
-## 1. Présentation courte de la solution
+## Présentation de la solution
 
-ErgoSense est un prototype portable qui vise à aider les personnes
-travaillant longtemps assises devant un ordinateur à prendre conscience
-d'une posture penchée maintenue. Un capteur inertiel mesure
-l'orientation et les mouvements du haut du corps. Un ESP32 traite
-localement ces mesures et peut déclencher une vibration lorsqu'une
-posture définie comme défavorable persiste au-delà d'une durée réglable.
-Le dispositif envoie ensuite des résumés et des événements à une
-plateforme IoT afin de visualiser l'historique et les tendances.
+ErgoSense est un prototype qui vise à aider les personnes travaillant
+longtemps assises devant un ordinateur à prendre conscience d'une
+inclinaison prolongée du haut du corps. Un capteur inertiel MPU6050
+mesure l'accélération et la vitesse angulaire. Un ESP32 traite
+localement les mesures et peut commander un moteur vibrant lorsqu'une
+condition de posture définie persiste. Le dispositif envoie ensuite des
+mesures résumées et des événements à une plateforme IoT pour visualiser
+l'historique et les tendances.
 
-**Limite importante :** le prototype estime l'orientation du segment du
-corps où le capteur est fixé. Il ne diagnostique pas une maladie, ne
-mesure pas directement la fatigue et ne garantit pas qu'une posture soit
-médicalement mauvaise. La position du capteur, la calibration et les
-essais avec plusieurs utilisateurs influencent les résultats.
+**Limites :** le système estime l'orientation au niveau où le capteur
+est fixé. Il ne diagnostique pas une maladie, ne mesure pas directement
+la fatigue et ne prouve pas à lui seul qu'une posture est médicalement
+mauvaise. Le placement du capteur, la calibration et les essais
+utilisateurs influencent les résultats.
 
-## 2. TP0 --- Partie I : Choix des dispositifs IoT
+# Partie I --- Choix des dispositifs IoT
 
-### Question 1 --- Quelle est la valeur ajoutée globale de la solution ?
-
-**Réponse proposée :**
+## 1. Quelle est la valeur ajoutée globale de la solution ?
 
 La solution ErgoSense vise à améliorer la prise de conscience posturale
 des étudiants et des personnes qui travaillent longtemps devant un
@@ -43,184 +41,296 @@ discrète. Les données collectées permettent de visualiser la durée des
 au cours du temps sur un tableau de bord IoT. L'objectif est de fournir
 un retour simple et mesurable, et non de poser un diagnostic médical.
 
-**Valeur ajoutée attendue :** - retour haptique local sans devoir
-regarder un écran ; - historique des événements et visualisation des
-tendances ; - possibilité de calibrer le seuil et la durée selon
-l'utilisateur ; - fonctionnement de l'alerte locale même si le Wi-Fi ou
-la plateforme est indisponible.
+**Valeur ajoutée attendue :** - Retour haptique local sans devoir
+regarder un écran. - Historique des événements et visualisation des
+tendances. - Possibilité d'ajuster le seuil et la durée après
+calibration. - Fonctionnement de la détection et de la vibration même si
+le Wi-Fi est indisponible.
 
-### Question 2 --- Quelles sont les contraintes qui pourraient influencer le choix du dispositif ?
-
-**Réponse proposée :**
+## 2. Quelles sont les contraintes qui pourraient influencer le choix du dispositif ?
 
 Le choix du dispositif doit prendre en compte la portabilité, le
 confort, la consommation énergétique, le coût, la disponibilité des
-composants, la fiabilité des mesures et la connectivité. Le capteur doit
-être fixé de manière stable, idéalement sur le haut du dos ou sur un
-support vestimentaire adapté, car la position du capteur détermine ce
-que l'on peut estimer. Le dispositif doit aussi fonctionner sans
-dépendre en permanence d'Internet : la détection et la vibration doivent
-être exécutées localement par l'ESP32. La transmission Wi-Fi doit être
-limitée à des résumés et événements utiles afin de réduire le trafic et
-la consommation. Enfin, les mesures doivent être calibrées et testées,
-car les accélérations pendant les mouvements peuvent perturber
-l'estimation de l'inclinaison.
+composants, la fiabilité des mesures et la connectivité. Le capteur sera
+fixé sur le haut du dos ou sur un support vestimentaire stable afin
+d'estimer l'inclinaison du torse. Le traitement de détection et la
+commande de vibration seront exécutés localement sur l'ESP32 pour ne pas
+dépendre de la connexion Internet.
 
-**Dispositifs retenus pour le prototype :**
+Le prototype utilisera : - **ESP32 :** lecture du capteur, traitement
+local et connexion Wi-Fi. - **MPU6050 :** mesures d'accélération sur
+trois axes et de vitesse angulaire sur trois axes. - **Moteur vibrant et
+étage de commande adapté :** retour haptique, à confirmer selon le
+matériel disponible. - **Batterie et circuit de charge/protection
+compatibles :** à choisir après vérification de la carte et des besoins
+d'autonomie.
 
-  ---------------------------------------------------------------------------
-  Élément                 Rôle                    Justification
-  ----------------------- ----------------------- ---------------------------
-  ESP32 (carte de         Lecture du capteur,     Offre des entrées/sorties
-  développement déjà      traitement local,       adaptées au prototype et
-  disponible)             connexion Wi-Fi         une connectivité Wi-Fi
-                                                  intégrée sur les variantes
-                                                  courantes d'ESP32. Vérifier
-                                                  le modèle exact de la
-                                                  carte.
+Un moteur ne doit pas être alimenté directement depuis une broche GPIO
+de l'ESP32 ; un étage de commande adapté est nécessaire. La référence
+exacte de la carte ESP32 et les caractéristiques du module MPU6050
+doivent être vérifiées. Le MPU6050 ne mesure pas directement la posture
+: celle-ci est estimée à partir des mesures et de la calibration.
 
-  MPU6050 (module déjà    Mesure de               Suffisant pour un prototype
-  disponible)             l'accélération sur 3    qui estime
-                          axes et de la vitesse   l'orientation/inclinaison
-                          angulaire sur 3 axes    et détecte les mouvements.
-                                                  Il ne mesure pas
-                                                  directement la posture et
-                                                  ne possède pas de
-                                                  magnétomètre.
+## 3. À quelle fréquence le dispositif doit-il envoyer des données à la plateforme ?
 
-  Moteur vibrant +        Retour haptique lors    Permet une notification
-  transistor/MOSFET       d'une alerte            discrète. Ne pas alimenter
-  adapté                                          directement un moteur
-                                                  depuis une broche GPIO :
-                                                  utiliser un étage de
-                                                  commande approprié et une
-                                                  alimentation adaptée.
-
-  Batterie et module de   Alimentation portable   À sélectionner selon la
-  charge/protection                               carte, le moteur et
-  compatibles                                     l'autonomie visée.
-                                                  Respecter les
-                                                  spécifications de la
-                                                  batterie et du module de
-                                                  charge.
-  ---------------------------------------------------------------------------
-
-**Choix de conception :** le capteur sera porté sur le haut du dos ou
-sur un support vestimentaire stable, et non simplement au poignet, pour
-estimer l'inclinaison du torse. Une calibration de référence sera
-effectuée lorsque l'utilisateur adopte la position de départ choisie. Le
-seuil d'inclinaison et la durée de persistance seront ajustables après
-les premiers essais ; ils ne doivent pas être présentés comme des seuils
-médicaux universels.
-
-### Question 3 --- À quelle fréquence le dispositif doit-il envoyer des données à la plateforme ?
-
-Il faut distinguer la fréquence de lecture du capteur de la fréquence
-d'envoi des données vers la plateforme.
-
-**Paramètres initiaux proposés pour le prototype :**
+Il faut distinguer la fréquence d'échantillonnage du capteur et la
+fréquence de transmission réseau.
 
   -----------------------------------------------------------------------
-  Opération               Fréquence initiale      Pourquoi
+  Opération               Valeur initiale         Justification
                           proposée                
   ----------------------- ----------------------- -----------------------
-  Lecture du MPU6050      25 Hz (25               Point de départ
-                          échantillons/s)         raisonnable pour suivre
-                                                  l'orientation et les
-                                                  mouvements sans traiter
-                                                  inutilement un volume
-                                                  élevé de données. À
-                                                  confirmer par des
-                                                  essais.
+  Lecture du MPU6050      25 Hz                   Point de départ pour
+                                                  suivre l'orientation et
+                                                  les mouvements ; à
+                                                  valider par des essais.
 
-  Évaluation locale de la Toutes les 0,5 s        Suffisant pour détecter
-  posture                 environ (2 Hz)          une inclinaison
-                                                  maintenue, avec une
-                                                  logique de persistance
-                                                  pour éviter les alertes
-                                                  sur les mouvements
-                                                  brefs.
+  Évaluation locale de la Environ toutes les 0,5  Permet de vérifier si
+  posture                 s                       une condition persiste
+                                                  plutôt que de réagir à
+                                                  chaque mouvement bref.
 
   Envoi périodique à la   Toutes les 2 s au       Fournit une
   plateforme              départ                  visualisation presque
                                                   en temps réel sans
-                                                  transmettre chaque
-                                                  échantillon brut. Cette
-                                                  fréquence pourra être
-                                                  réduite ou augmentée
-                                                  après les tests.
+                                                  envoyer chaque
+                                                  échantillon brut.
 
-  Envoi d'un événement    À l'événement, par      Permet de signaler les
-  important               exemple lorsqu'une      changements utiles sans
-                          alerte commence ou se   attendre le prochain
-                          termine                 envoi périodique.
-
-  Vibration               Après persistance       Évite de vibrer pour
-                          au-delà d'une durée     chaque mouvement bref ;
-                          réglable                la durée doit être
-                                                  choisie lors des essais
-                                                  utilisateur.
+  Envoi d'événement       Lorsqu'une alerte       Signale rapidement les
+                          commence ou se termine  changements utiles.
   -----------------------------------------------------------------------
 
-**Réponse rédigée pour le TP :**
+Ces valeurs sont des paramètres initiaux, pas des résultats mesurés.
+Elles seront ajustées selon la stabilité de la détection, la latence, la
+qualité de la connexion et l'autonomie. La vibration, si le moteur est
+disponible, sera déclenchée localement après une durée de persistance
+réglable.
 
-Le MPU6050 sera lu initialement à 25 Hz. L'ESP32 évaluera localement
-l'inclinaison environ toutes les 0,5 seconde et déclenchera une
-vibration seulement si la condition définie persiste pendant une durée
-réglable. Pour limiter le trafic réseau et la consommation, la
-plateforme recevra des données résumées toutes les 2 secondes au début
-du prototype, ainsi que des messages événementiels lors d'une alerte.
-Ces fréquences sont des valeurs de départ à valider expérimentalement ;
-elles seront ajustées selon la stabilité de la détection, la latence, la
-fiabilité de la connexion et l'autonomie mesurée. La détection et la
-vibration resteront locales afin de continuer à fonctionner en cas de
-perte du Wi-Fi.
+# Partie II --- Spécification de la topologie réseau des dispositifs IoT
+
+## 1. Connexion directe à la plateforme ou utilisation d'une passerelle ?
+
+Pour le prototype, l'ESP32 se connectera directement au réseau Wi-Fi
+fourni par un point d'accès, par exemple le partage de connexion d'un
+téléphone. Le téléphone sert uniquement de point d'accès réseau ; il
+n'effectue pas le traitement applicatif et n'est pas une passerelle IoT
+dédiée. L'ESP32 enverra les données via Internet à la plateforme IoT
+choisie.
+
+**Topologie proposée :**
+
+``` text
+MPU6050
+   │ I²C
+   ▼
+ESP32 ── Wi-Fi ──► Point d’accès du téléphone
+                         │ Internet
+                         ▼
+                  Plateforme IoT
+                  (ThingsBoard envisagé)
+                         │
+                         ▼
+                 Tableau de bord web
+```
+
+Aucune passerelle séparée n'est nécessaire pour ce prototype, car
+l'ESP32 possède une connectivité Wi-Fi. Cette approche réduit le nombre
+de composants et le temps de développement. Elle dépend toutefois de la
+disponibilité du partage de connexion, de l'accès Internet et de la
+possibilité pour la plateforme d'accepter la connexion.
+
+## 2. Quels protocoles de communication sont prévus ?
+
+Les protocoles proposés sont :
+
+-   **I²C entre le MPU6050 et l'ESP32 :** bus local court pour lire les
+    mesures du capteur.
+-   **Wi-Fi entre l'ESP32 et le point d'accès :** adapté à un prototype
+    en intérieur avec un débit suffisant et sans module radio
+    supplémentaire.
+-   **MQTT entre l'ESP32 et la plateforme IoT :** protocole léger de
+    messagerie publish/subscribe adapté à la télémétrie. Il sera utilisé
+    si l'instance de plateforme sélectionnée permet une connexion MQTT
+    depuis l'ESP32.
+-   **HTTPS pour l'accès au tableau de bord web :** utilisé par le
+    navigateur pour consulter l'interface de la plateforme.
+
+MQTT est le choix privilégié pour la télémétrie. HTTP/HTTPS reste une
+solution de remplacement si MQTT n'est pas pris en charge ou s'il se
+révèle plus difficile à configurer dans l'environnement retenu. Le choix
+final dépendra des paramètres d'accès, des identifiants et de la
+compatibilité de l'instance ThingsBoard utilisée.
+
+**Point de vigilance :** le partage de connexion mobile peut entraîner
+une consommation de données et une latence variables. Les messages
+seront donc limités aux mesures résumées et aux événements utiles. Les
+identifiants de connexion ne doivent jamais être publiés dans le dépôt
+GitHub.
+
+# Partie III --- Stockage, mise à jour et traitement des données
+
+## 1. Comment les données sont-elles stockées sur la plateforme et à quelle fréquence sont-elles mises à jour ?
+
+La plateforme envisagée est **ThingsBoard**, sous réserve de confirmer
+qu'une instance accessible et adaptée au projet peut être utilisée. Elle
+recevra des données de télémétrie de l'ESP32 et les associera à des
+horodatages. Les données pourront être visualisées dans un tableau de
+bord et conservées selon les capacités et la politique de rétention de
+l'instance choisie. Le mode de stockage exact dépendra de l'instance
+ThingsBoard utilisée ; il ne faut pas supposer qu'une base de données ou
+une durée de conservation spécifique est garantie avant de vérifier sa
+configuration.
+
+**Données proposées :** - angle ou indicateur d'inclinaison estimé ; -
+état de posture estimé (par exemple `normal` ou `leaning`) ; - état
+d'alerte ; - durée de l'épisode détecté ou compteur d'événements ; -
+horodatage ou temps écoulé depuis le démarrage.
+
+Les noms et unités exacts des champs seront fixés pendant
+l'implémentation. Il est préférable de transmettre des mesures résumées
+toutes les deux secondes au début, ainsi que des événements lorsqu'une
+alerte commence ou se termine, plutôt que chaque échantillon brut du
+capteur.
+
+## 2. Quels traitements ou filtres sont appliqués avant le stockage ?
+
+Le traitement proposé sur l'ESP32 comprend : 1. Lecture périodique des
+données du MPU6050. 2. Calibration d'une orientation de référence
+lorsque le capteur est placé correctement. 3. Estimation de
+l'inclinaison à partir des mesures inertielles. 4. Lissage simple ou
+filtrage des mesures si les premiers essais montrent du bruit. 5.
+Application d'un seuil et d'une durée de persistance configurables afin
+d'ignorer les mouvements brefs. 6. Envoi de télémétrie résumée et
+d'événements vers la plateforme.
+
+Le filtrage exact sera choisi après observation des mesures réelles. Une
+mesure issue d'un accéléromètre peut être perturbée par les mouvements
+dynamiques ; il faudra donc tester le dispositif en position assise,
+pendant des mouvements ordinaires et lors de changements volontaires de
+posture.
+
+Si la connexion Wi-Fi est perdue, la détection et la vibration doivent
+continuer localement. La transmission reprendra lorsque la connexion
+sera rétablie. La mise en mémoire tampon locale des messages non envoyés
+est une amélioration possible, mais elle ne sera incluse que si le temps
+de développement le permet.
+
+# Partie IV --- Utilisation des données pour générer une meilleure valeur
+
+## 1. Comment les données collectées peuvent-elles créer de la valeur ?
+
+Les données d'ErgoSense peuvent apporter une valeur pratique à
+l'utilisateur et fournir des indicateurs pour évaluer le prototype.
+
+-   **Retour immédiat :** la vibration rappelle à l'utilisateur qu'une
+    condition de posture configurée persiste.
+-   **Suivi des habitudes :** le tableau de bord peut afficher le nombre
+    d'épisodes détectés, leur durée cumulée et leur répartition dans le
+    temps.
+-   **Évaluation des progrès :** l'utilisateur peut comparer les
+    statistiques de différentes sessions, sans interpréter ces données
+    comme un diagnostic médical.
+-   **Personnalisation :** les seuils et la durée de persistance peuvent
+    être ajustés selon la calibration et les résultats d'essais.
+-   **Évaluation technique :** les événements et les mesures permettent
+    à l'équipe de comparer le comportement du système dans différentes
+    situations, d'identifier les fausses alertes et d'améliorer la
+    détection.
+-   **Potentiel d'évolution :** une version future pourrait produire des
+    rapports de tendances ou être utilisée dans des programmes de
+    sensibilisation ergonomique, avec consentement des utilisateurs et
+    protection des données.
+
+La valeur principale du prototype est d'associer un retour haptique
+local à une visualisation de données dans une plateforme IoT. Le tableau
+de bord permet de mieux comprendre les événements détectés et d'évaluer
+le fonctionnement du système. Il ne faut pas prétendre que le dispositif
+prévient ou traite une maladie sans études appropriées.
+
+## Indicateurs possibles pour démontrer le projet
+
+Pour évaluer le prototype, l'équipe peut mesurer : - la proportion
+d'épisodes volontairement provoqués qui sont détectés ; - le nombre de
+fausses alertes pendant une session de test ; - le délai entre le début
+d'une condition persistante et la vibration ; - la régularité de la
+réception des données sur le tableau de bord ; - le comportement du
+système lorsque le Wi-Fi est coupé puis rétabli.
+
+Les résultats devront être mesurés pendant les essais et rapportés
+honnêtement ; aucune performance n'est considérée comme validée dans ce
+document.
 
 ------------------------------------------------------------------------
 
-## 3. Décisions prises et points encore ouverts
+# Synthèse des choix de conception
 
-### Décisions initiales
+  -----------------------------------------------------------------------
+  Élément                 Choix provisoire        État
+  ----------------------- ----------------------- -----------------------
+  Microcontrôleur         ESP32                   Matériel déclaré
+                                                  disponible ; référence
+                                                  exacte à vérifier
 
--   Carte disponible : ESP32 (vérifier la référence exacte).
--   Capteur disponible : module MPU6050.
--   Position envisagée : haut du dos / support vestimentaire stable.
--   Détection et vibration : traitement local sur l'ESP32.
--   Fréquence de lecture initiale : 25 Hz.
--   Envoi initial vers la plateforme : toutes les 2 secondes, plus
-    événements.
--   Plateforme IoT : pas encore choisie.
+  Capteur                 MPU6050                 Matériel déclaré
+                                                  disponible ;
+                                                  communication à tester
 
-### À vérifier avant de finaliser le matériel
+  Position du capteur     Haut du dos / support   Choix de conception
+                          vestimentaire stable    
 
--   Référence exacte de la carte ESP32 et tension logique.
--   Broches I²C disponibles et câblage réel du module MPU6050.
--   Présence et caractéristiques du moteur vibrant.
--   Type de batterie, circuit de protection/charge et autonomie
-    souhaitée.
--   Stabilité des mesures lorsque le capteur est porté.
--   Seuil et durée de persistance à choisir à partir de données de test,
-    pas à partir d'une valeur médicale supposée.
+  Retour haptique         Moteur vibrant avec     Disponibilité non
+                          commande adaptée        vérifiée
 
-## 4. Références techniques à consulter pendant l'implémentation
+  Réseau local            Wi-Fi via partage de    Environnement prévu ; à
+                          connexion du téléphone  tester
+
+  Protocole de télémétrie MQTT                    Proposé, sous réserve
+                                                  de compatibilité de la
+                                                  plateforme
+
+  Plateforme              ThingsBoard             Candidate, accès et
+                                                  configuration à
+                                                  confirmer
+
+  Lecture du capteur      25 Hz                   Valeur initiale
+                                                  proposée
+
+  Évaluation locale       Environ 2 fois par      Valeur initiale
+                          seconde                 proposée
+
+  Transmission périodique Toutes les 2 s +        Valeur initiale
+                          événements              proposée
+
+  Stockage                Télémétrie horodatée    À confirmer selon
+                          sur la plateforme       l'instance
+
+  Traitement              Calibration,            À implémenter et tester
+                          estimation, filtrage    
+                          éventuel et persistance 
+  -----------------------------------------------------------------------
+
+## Références techniques à consulter
 
 -   Documentation Espressif ESP32 :
     https://docs.espressif.com/projects/esp-idf/en/stable/esp32/
--   Fiche technique InvenSense/TDK MPU-6050 (accéléromètre et gyroscope
-    6 axes) : rechercher la fiche technique officielle «
-    MPU-6000/MPU-6050 Product Specification » sur le site du fabricant.
 -   Documentation Arduino-ESP32 si l'implémentation utilise Arduino IDE
     : https://docs.espressif.com/projects/arduino-esp32/en/latest/
+-   Documentation ThingsBoard : https://thingsboard.io/docs/
+-   Spécification officielle du MPU-6050 : consulter la fiche technique
+    « MPU-6000/MPU-6050 Product Specification » du fabricant.
 
-> Avant de remettre le rapport, vérifier les spécifications contre la
-> référence exacte du matériel utilisé et noter les résultats réels des
-> essais. Les fréquences de ce document sont des paramètres initiaux
-> proposés, pas des mesures validées.
+## Prochaines étapes pratiques
 
-## 5. Prochaine étape
+1.  Identifier la référence exacte de la carte ESP32.
+2.  Tester la communication I²C entre l'ESP32 et le MPU6050.
+3.  Vérifier si un moteur vibrant et un circuit de commande sont
+    disponibles.
+4.  Créer et tester l'accès à l'instance ThingsBoard choisie.
+5.  Valider la connexion MQTT avec un petit message de test.
+6.  Mesurer les fréquences, la stabilité de la détection et le
+    comportement lors d'une perte de réseau.
 
-Après validation de cette Partie I, rédiger la Partie II du TP0 :
-topologie réseau, choix entre connexion directe et passerelle, et
-justification du protocole de communication. La plateforme et le
-protocole (par exemple MQTT ou HTTP) seront sélectionnés en fonction des
-exigences du TP, de la facilité de mise en œuvre et du temps disponible.
+**Important :** ce document est une proposition de conception. Les
+fréquences, la topologie, la plateforme et les performances doivent être
+confirmées pendant l'implémentation. Les décisions finales seront mises
+à jour dans le dépôt après les tests.
