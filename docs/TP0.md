@@ -13,7 +13,7 @@ Things\
 ErgoSense est un prototype qui vise à aider les personnes travaillant
 longtemps assises devant un ordinateur à prendre conscience d'une
 inclinaison prolongée du haut du corps. Un capteur inertiel MPU6050
-mesure l'accélération et la vitesse angulaire. Un ESP32 traite
+mesure l'accélération et la vitesse angulaire. Un Microcontrôleur traite
 localement les mesures et peut commander un moteur vibrant lorsqu'une
 condition de posture définie persiste. Le dispositif envoie ensuite des
 mesures résumées et des événements à une plateforme IoT pour visualiser
@@ -54,8 +54,8 @@ d'estimer l'inclinaison du torse. Le traitement de détection et la
 commande de vibration seront exécutés localement sur l'ESP32 pour ne pas
 dépendre de la connexion Internet.
 
-Le prototype utilisera : - **ESP32 :** lecture du capteur, traitement
-local et connexion Wi-Fi. - **MPU6050 :** mesures d'accélération sur
+Le prototype utilisera : - **Microcontrôleur :** lecture du capteur, traitement
+local et connexion Wi-Fi. - **Capteur :** mesures d'accélération sur
 trois axes et de vitesse angulaire sur trois axes. - **Moteur vibrant et
 étage de commande adapté :** retour haptique, à confirmer selon le
 matériel disponible. - **Batterie et circuit de charge/protection
@@ -63,7 +63,7 @@ compatibles :** à choisir après vérification de la carte et des besoins
 d'autonomie.
 
 Un moteur ne doit pas être alimenté directement depuis une broche GPIO
-de l'ESP32 ; un étage de commande adapté est nécessaire. La référence
+du microcontrôleur ; un étage de commande adapté est nécessaire. La référence
 exacte de la carte ESP32 et les caractéristiques du module MPU6050
 doivent être vérifiées. Le MPU6050 ne mesure pas directement la posture
 : celle-ci est estimée à partir des mesures et de la calibration.
